@@ -2,7 +2,7 @@ inverter:
   mode: neoom_beaam   # "neoom_beaam" oder "solax_modbus"
 
   neoom_beaam:
-    host: 192.168.178.84
+    host: ""
     endpoint: /api/v1/site/state
     token: ""
     timeout: 10
@@ -11,7 +11,7 @@ inverter:
       house_power: POWER_CONSUMPTION_CALC
 
   solax_modbus:
-    host: 192.168.178.88
+    host: ""
     port: 502
     unit_id: 1
 
@@ -24,7 +24,7 @@ wallbox:
   mode: cloud   # "cloud" oder "local"
 
   local:
-    host: 192.168.1.60
+    host: ""
 
   cloud:
     api_key: ""

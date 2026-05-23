@@ -16,7 +16,7 @@ def setup_logging():
 
 def create_inverter(cfg):
     return NeoomBeaamClient(
-        host=cfg.require("inverter", "neoom_beaam", "host"),
+        host=cfg.require_env("NEOOM_BEAAM_HOST", "inverter", "neoom_beaam", "host"),
         token=cfg.require_secret(
             "NEOOM_BEAAM_API_TOKEN",
             "inverter",

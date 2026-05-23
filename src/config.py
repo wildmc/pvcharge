@@ -17,7 +17,9 @@ class Config:
         with open(config_path, "r", encoding="utf-8") as f:
             data = yaml.safe_load(f)
 
-        return Config(raw=data)
+        config = Config(raw=data)
+        config.apply_env_overrides()
+        return config
 
     @staticmethod
     def load_env_file(path: str = ".env") -> None:
@@ -85,16 +87,42 @@ class Config:
             raise ValueError(f"Missing config key: {'.'.join(keys)}")
         return value
 
-    def get_secret(self, env_name, *keys, default=None):
+    def set(self, *keys, value):
+        target = self.raw
+        for key in keys[:-1]:
+            target = target.setdefault(key, {})
+        target[keys[-1]] = value
+
+    def apply_env_overrides(self):
+        overrides = {
+            "NEOOM_BEAAM_HOST": ("inverter", "neoom_beaam", "host"),
+            "SOLAX_MODBUS_HOST": ("inverter", "solax_modbus", "host"),
+            "EASEE_LOCAL_HOST": ("wallbox", "local", "host"),
+            "NEOOM_BEAAM_API_TOKEN": ("inverter", "neoom_beaam", "token"),
+            "EASEE_API_KEY": ("wallbox", "cloud", "api_key"),
+        }
+
+        for env_name, keys in overrides.items():
+            value = os.getenv(env_name)
+            if value:
+                self.set(*keys, value=value)
+
+    def get_env(self, env_name, *keys, default=None):
         value = os.getenv(env_name)
         if value:
             return value
         return self.get(*keys, default=default)
 
+    def require_env(self, env_name, *keys):
+        value = self.get_env(env_name, *keys, default=None)
+        if value:
+            return value
+        raise ValueError(
+            f"Missing value: set {env_name} or config key {'.'.join(keys)}"
+        )
+
+    def get_secret(self, env_name, *keys, default=None):
+        return self.get_env(env_name, *keys, default=default)
+
     def require_secret(self, env_name, *keys):
-        value = self.get_secret(env_name, *keys, default=None)
-        if value is None:
-            raise ValueError(
-                f"Missing secret: set {env_name} or config key {'.'.join(keys)}"
-            )
-        return value
+        return self.require_env(env_name, *keys)

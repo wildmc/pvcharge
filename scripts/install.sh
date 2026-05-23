@@ -39,6 +39,9 @@ pip install -r requirements.txt
 if [ ! -f .env ]; then
 cat > .env << EOF
 EASEE_API_KEY=
+EASEE_LOCAL_HOST=
+NEOOM_BEAAM_HOST=
+SOLAX_MODBUS_HOST=
 NEOOM_BEAAM_API_TOKEN=
 EOF
 chmod 600 .env
@@ -48,12 +51,29 @@ fi
 if [ ! -f config.yaml ]; then
 cat > config.yaml << EOF
 inverter:
-  host: 192.168.1.50
-  port: 502
-  unit_id: 1
+  mode: neoom_beaam
+
+  neoom_beaam:
+    host: ""
+    endpoint: /api/v1/site/state
+    token: ""
+    timeout: 10
+    keys:
+      pv_power: POWER_PRODUCTION
+      house_power: POWER_CONSUMPTION_CALC
+
+  solax_modbus:
+    host: ""
+    port: 502
+    unit_id: 1
+    registers:
+      pv_power: 10
+      house_power: 70
 
 wallbox:
   mode: cloud
+  local:
+    host: ""
   cloud:
     api_key: ""
     charger_id: ""
