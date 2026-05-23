@@ -1,11 +1,11 @@
 inverter:
-  mode: neoom_beaam   # "neoom_beaam" oder "solax_modbus"
+  mode: neoom_beaam   # "neoom_beaam" or "solax_modbus"
 
   neoom_beaam:
     host: ""
     endpoint: /api/v1/site/state
     token: ""
-    timeout: 10
+    timeout: 10       # s
     keys:
       pv_power: POWER_PRODUCTION
       house_power: POWER_CONSUMPTION_CALC
@@ -15,13 +15,13 @@ inverter:
     port: 502
     unit_id: 1
 
-    # Best Guess SolaX X3 (Modbus TCP)
+    # Best guess SolaX X3 (Modbus TCP)
     registers:
-      pv_power: 10        # PV total / PV1+PV2 power (kW/W je nach Modell)
-      house_power: 70     # Grid/Load power (haeufig meter power)
+      pv_power: 10        # register address for PV power, value unit depends on model (usually W)
+      house_power: 70     # register address for grid/load power, value unit depends on model (usually W)
 
 wallbox:
-  mode: cloud   # "cloud" oder "local"
+  mode: cloud   # "cloud" or "local"
 
   local:
     host: ""
@@ -31,21 +31,21 @@ wallbox:
     charger_id: "EHXXXXXXX"
 
 control:
-  poll_interval: 20
-  wallbox_update_interval: 240
+  poll_interval: 20             # s
+  wallbox_update_interval: 240  # s
 
-  averaging_window: 12   # 12 * 20s = 4 min
+  averaging_window: 12          # samples, 12 * 20 s = 240 s
 
-  voltage: 230.0
+  voltage: 230.0                # V
 
-  min_current: 6
-  max_current: 16
+  min_current: 6                # A
+  max_current: 16               # A
 
-  # Hysterese gegen Takten
-  surplus_start_threshold: 1500
-  surplus_stop_threshold: 1200
+  # Hysteresis against rapid start/stop switching
+  surplus_start_threshold: 1500 # W
+  surplus_stop_threshold: 1200  # W
 
-  # Sicherheitsverhalten
+  # Safety behavior
   stop_below_min_current: true
 
 mqtt:
