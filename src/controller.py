@@ -1,0 +1,144 @@
+import time
+import logging
+
+
+class PVController:
+
+    def __init__(self, inverter, wallbox, config, mqtt=None):
+        self.inverter = inverter
+        self.wallbox = wallbox
+        self.config = config
+        self.mqtt = mqtt
+
+        self.buffer = []
+        self.last_wallbox_update = 0
+
+        self.state = "IDLE"
+        self.last_amps = 0
+
+    # -------------------------
+    # helpers
+    # -------------------------
+
+    def _avg(self):
+        if not self.buffer:
+            return 0.0
+        return sum(self.buffer) / len(self.buffer)
+
+    def _calc_amps(self, surplus_w):
+        voltage = self.config["control"]["voltage"]
+        amps = int(surplus_w / voltage)
+
+        return max(
+            0,
+            min(amps, self.config["control"]["max_current"])
+        )
+
+    def _should_charge(self, avg_surplus):
+        return avg_surplus >= self.config["control"]["surplus_start_threshold"]
+
+    def _should_stop(self, avg_surplus):
+        return avg_surplus <= self.config["control"]["surplus_stop_threshold"]
+
+    # -------------------------
+    # main loop
+    # -------------------------
+
+    def run(self):
+
+        poll_interval = self.config["control"]["poll_interval"]
+        update_interval = self.config["control"]["wallbox_update_interval"]
+        min_current = self.config["control"]["min_current"]
+
+        while True:
+
+            # 1. read inverter
+            data = self.inverter.read_power_data()
+
+            self.buffer.append(data.surplus_power)
+            if len(self.buffer) > self.config["control"]["averaging_window"]:
+                self.buffer.pop(0)
+
+            avg = self._avg()
+
+            logging.info(
+                "PV=%.0fW House=%.0fW Surplus=%.0fW Avg=%.0fW State=%s",
+                data.pv_power,
+                data.house_power,
+                data.surplus_power,
+                avg,
+                self.state
+            )
+
+            if self.mqtt:
+                self.mqtt.publish(data, avg)
+
+            now = time.time()
+
+            # -------------------------
+            # 2. state machine
+            # -------------------------
+
+            if self.state == "IDLE":
+
+                if self._should_charge(avg):
+                    self.state = "CHARGING"
+                    logging.info("Switching to CHARGING")
+
+            elif self.state == "CHARGING":
+
+                if self._should_stop(avg):
+                    self.wallbox.stop_charging()
+                    self.state = "IDLE"
+                    self.last_amps = 0
+                    logging.info("Stopping charging (low surplus)")
+
+            # -------------------------
+            # 3. wallbox heartbeat (EVERY 4 min)
+            # -------------------------
+
+            if now - self.last_wallbox_update > update_interval:
+
+                if self.state == "CHARGING":
+
+                    amps = self._calc_amps(avg)
+
+                    if amps < min_current:
+                        logging.info("Below min current -> stop charging")
+                        self.wallbox.stop_charging()
+                        self.state = "IDLE"
+                        self.last_amps = 0
+
+                    else:
+                        # nur aktualisieren wenn Änderung sinnvoll
+                        if abs(amps - self.last_amps) >= 1:
+
+                            logging.info(
+                                "Updating charger current: %dA (TTL refresh)",
+                                amps
+                            )
+
+                            # ✅ WICHTIG: TTL = fail-safe
+                            self.wallbox.set_current_limit(
+                                amps=amps,
+                                duration_min=10
+                            )
+
+                            self.wallbox.start_charging()
+                            self.last_amps = amps
+
+                        else:
+                            # heartbeat refresh ohne Änderung
+                            logging.debug("TTL refresh only (no amp change)")
+                            self.wallbox.set_current_limit(
+                                amps=self.last_amps,
+                                duration_min=10
+                            )
+
+                self.last_wallbox_update = now
+
+            # -------------------------
+            # 4. sleep
+            # -------------------------
+
+            time.sleep(poll_interval)

@@ -1,0 +1,26 @@
+[Unit]
+Description=PV Charge Control (Solar Surplus Charging)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+
+User=pi
+Group=pi
+
+WorkingDirectory=/opt/pv-charge-control
+
+ExecStart=/opt/pv-charge-control/venv/bin/python main.py
+
+Restart=always
+RestartSec=10
+
+# wichtig für stabile Logs im journal
+Environment=PYTHONUNBUFFERED=1
+
+# optional hardening (Pi-friendly, nicht zu aggressiv)
+NoNewPrivileges=true
+
+[Install]
+WantedBy=multi-user.target

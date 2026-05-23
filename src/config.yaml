@@ -1,0 +1,55 @@
+inverter:
+  mode: neoom_beaam   # "neoom_beaam" oder "solax_modbus"
+
+  neoom_beaam:
+    host: 192.168.178.XX
+    endpoint: /api/v1/site/state
+    token: "PUT_YOUR_BEAAM_API_TOKEN_HERE"
+    timeout: 10
+    keys:
+      pv_power: POWER_PRODUCTION
+      house_power: POWER_CONSUMPTION_CALC
+
+  solax_modbus:
+    host: 192.168.178.88
+    port: 502
+    unit_id: 1
+
+    # Best Guess SolaX X3 (Modbus TCP)
+    registers:
+      pv_power: 10        # PV total / PV1+PV2 power (kW/W je nach Modell)
+      house_power: 70     # Grid/Load power (haeufig meter power)
+
+wallbox:
+  mode: cloud   # "cloud" oder "local"
+
+  local:
+    host: 192.168.1.60
+
+  cloud:
+    api_key: "PUT_YOUR_API_KEY_HERE"
+    charger_id: "EHXXXXXXX"
+
+control:
+  poll_interval: 20
+  wallbox_update_interval: 240
+
+  averaging_window: 12   # 12 * 20s = 4 min
+
+  voltage: 230.0
+
+  min_current: 6
+  max_current: 16
+
+  # Hysterese gegen Takten
+  surplus_start_threshold: 1500
+  surplus_stop_threshold: 1200
+
+  # Sicherheitsverhalten
+  stop_below_min_current: true
+
+mqtt:
+  enabled: false
+  host: 192.168.1.10
+  port: 1883
+  topic_prefix: pvcharge
