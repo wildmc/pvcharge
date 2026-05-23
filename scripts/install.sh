@@ -35,7 +35,16 @@ EOF
 
 pip install -r requirements.txt
 
-# 5. config placeholder
+# 5. env placeholder for local secrets
+if [ ! -f .env ]; then
+cat > .env << EOF
+EASEE_API_KEY=
+NEOOM_BEAAM_API_TOKEN=
+EOF
+chmod 600 .env
+fi
+
+# 6. config placeholder
 if [ ! -f config.yaml ]; then
 cat > config.yaml << EOF
 inverter:
@@ -74,16 +83,17 @@ Wants=network-online.target
 Type=simple
 User=$USER
 WorkingDirectory=$PROJECT_DIR
-ExecStart=$PROJECT_DIR/venv/bin/python main.py
+ExecStart=$PROJECT_DIR/venv/bin/python src/main.py
 Restart=always
 RestartSec=10
 Environment=PYTHONUNBUFFERED=1
+EnvironmentFile=-$PROJECT_DIR/.env
 
 [Install]
 WantedBy=multi-user.target
 EOF
 
-# 6. systemd reload + enable
+# 7. systemd reload + enable
 sudo systemctl daemon-reload
 sudo systemctl enable pv-charge-control.service
 

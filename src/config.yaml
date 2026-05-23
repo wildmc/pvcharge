@@ -4,7 +4,7 @@ inverter:
   neoom_beaam:
     host: 192.168.178.XX
     endpoint: /api/v1/site/state
-    token: "PUT_YOUR_BEAAM_API_TOKEN_HERE"
+    token: ""
     timeout: 10
     keys:
       pv_power: POWER_PRODUCTION
@@ -27,7 +27,7 @@ wallbox:
     host: 192.168.1.60
 
   cloud:
-    api_key: "PUT_YOUR_API_KEY_HERE"
+    api_key: ""
     charger_id: "EHXXXXXXX"
 
 control:

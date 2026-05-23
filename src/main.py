@@ -25,7 +25,7 @@ def create_inverter(cfg):
     if mode == "neoom_beaam":
         return NeoomBeaamClient(
             host=cfg.require("inverter", "neoom_beaam", "host"),
-            token=cfg.require("inverter", "neoom_beaam", "token"),
+            token=cfg.require_secret("NEOOM_BEAAM_API_TOKEN", "inverter", "neoom_beaam", "token"),
             endpoint=cfg.get("inverter", "neoom_beaam", "endpoint", default="/api/v1/site/state"),
             timeout=cfg.get("inverter", "neoom_beaam", "timeout", default=10),
             keys=cfg.get("inverter", "neoom_beaam", "keys", default={}),
@@ -55,7 +55,7 @@ def create_wallbox(cfg):
         )
 
     return EaseeCloudClient(
-        api_key=cfg.require("wallbox", "cloud", "api_key"),
+        api_key=cfg.require_secret("EASEE_API_KEY", "wallbox", "cloud", "api_key"),
         charger_id=cfg.require("wallbox", "cloud", "charger_id")
     )
 
