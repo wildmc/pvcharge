@@ -287,6 +287,27 @@ Example:
 `src/config.py` searches for configuration and `.env` in the usual working
 directories: current directory, `src/`, and project root.
 
+## Tests
+
+The project uses Python's built-in `unittest` framework. No additional test
+dependency is required.
+
+The tests use local mock implementations for the parts of the NEOOM BEAAM and
+Easee HTTP APIs that the clients call. This keeps the tests deterministic and
+prevents network access during test runs.
+
+Run the test suite from the repository root:
+
+```powershell
+.\.venv\Scripts\python.exe -m unittest discover -s tests
+```
+
+On Linux:
+
+```bash
+./venv/bin/python -m unittest discover -s tests
+```
+
 ## Design Decisions
 
 - No web server: the service is a small background process.
