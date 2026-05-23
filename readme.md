@@ -1,3 +1,6 @@
+*** BEWARE: This is not finished yet and far from a final work. Do not use unchanged! ***
+
+
 Randbedingungen
 
 * Raspberry Pi
