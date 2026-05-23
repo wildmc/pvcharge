@@ -1,9 +1,13 @@
 from datetime import datetime
+import logging
 
 import requests
 
 from inverter.base import InverterBase
 from models.models import PowerData
+
+
+logger = logging.getLogger(__name__)
 
 
 class NeoomBeaamClient(InverterBase):
@@ -77,11 +81,11 @@ class NeoomBeaamClient(InverterBase):
         state = self._get_state()
         data = self._power_data_from_state(state)
 
-        print(f"BEAAM API: {self.base_url}{self.endpoint}")
-        print(f"PV power: {data.pv_power:.0f} W")
-        print(f"House power: {data.house_power:.0f} W")
-        print(f"Surplus power: {data.surplus_power:.0f} W")
+        logger.info("BEAAM API: %s%s", self.base_url, self.endpoint)
+        logger.info("PV power: %.0f W", data.pv_power)
+        logger.info("House power: %.0f W", data.house_power)
+        logger.info("Surplus power: %.0f W", data.surplus_power)
 
-        print("Available energyFlow states:")
+        logger.info("Available energyFlow states:")
         for item in state.get("energyFlow", {}).get("states", []):
-            print(f"  {item.get('key')}: {item.get('value')}")
+            logger.info("  %s: %s", item.get("key"), item.get("value"))
