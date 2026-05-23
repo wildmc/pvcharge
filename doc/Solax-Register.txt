@@ -1,0 +1,204 @@
+MODBUS offset
+Description
+Units
+Data type
+1
+Grid current (X1)
+V
+smallint
+2
+Grid power (X1)
+W
+smallint
+3
+Pv voltage1 (Hybrid)
+V
+word
+4
+Pv voltage2 (Hybrid)
+V
+word
+5
+Pv current1 (Hybrid)
+A
+word
+6
+Pv current2 (Hybrid)
+A
+word
+7
+Grid frequency (X1)
+Hz
+word
+8
+Temperature
+
+smallint
+9
+Run mode
+
+word
+10
+Powerdc1 (Hybrid)
+W
+word
+11
+Powerdc2 (Hybrid)
+W
+word
+12
+Temper fault value
+
+smallint
+13
+Pv1Volt fault value
+V
+word
+14
+Pv2Volt fault value
+V
+word
+15
+Gfci fault value
+mA
+word
+16
+Grid volt fault value
+V
+word
+17
+Grid freq fault value T
+Hz
+word
+18
+Dci fault value
+mA
+word
+19
+Time count down
+ms
+word
+20
+Bat voltage charge1
+V
+smallint
+21
+Bat current charge1
+A
+smallint
+22
+Batpower charge1
+W
+smallint
+23
+BMS connect state
+
+word
+24
+Temperature bat
+
+smallint
+28
+Battery capacity
+%
+word
+29
+Output energy Charge.LSB
+KWh
+word
+30
+Output energy Charge.MSB
+KWh
+word
+31
+BMS warning LSB
+
+word
+32
+Output energy charge today
+KWh
+word
+33
+Input energy Charge.LSB
+KWh
+word
+34
+Input energy Charge.MSB
+KWh
+word
+35
+Input energy charge today
+KWh
+word
+36
+BMS charge max current
+A
+word
+37
+BMS discharge max current
+A
+word
+38
+BMS warning MSB
+
+word
+64
+Inv fault Message.LSB
+
+word
+65
+Inv fault Message.MSB
+
+word
+67
+Mgr fault message
+
+word
+70
+Feedin power (meter)
+w
+integer
+72
+Feedin energy total (meter)
+kwh
+dword
+74
+Consum energy total (meter)
+kwh
+dword
+76
+EPS volt (X1)
+V
+word
+77
+EPS current (X1)
+A
+word
+78
+EPS power (X1)
+VA
+word
+79
+EPS frequency (X1)
+Hz
+word
+80
+Etoday togrid
+kwh
+word
+82
+Etotal togrid
+kwh
+dword
+84
+Lock state
+
+word
+102
+Bus volt
+V
+word
+103
+W dcv fault val
+V
+word
