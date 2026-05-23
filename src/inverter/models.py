@@ -8,10 +8,3 @@ class PowerData:
     house_power: float
     surplus_power: float
     timestamp: datetime
-
-
-@dataclass
-class ChargerState:
-    enabled: bool
-    current_limit: int
-    timestamp: datetime
