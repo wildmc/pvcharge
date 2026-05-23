@@ -59,7 +59,7 @@ PV=3200W House=1100W Surplus=2100W FloatingMean=1850W TargetCurrent=8A State=CHA
 
 `src/main.py` is the application entry point. It:
 
-- loads `src/config.yaml` and `.env`
+- loads `config.yaml` and `.env`
 - creates a `NeoomBeaamClient`
 - creates the `PVController`
 - creates an Easee wallbox client
@@ -223,10 +223,10 @@ Do not commit `.env`. It is excluded via `.gitignore`.
 
 ### Check YAML Configuration
 
-The functional configuration lives in:
+The functional configuration lives at the repository top level:
 
 ```text
-src/config.yaml
+config.yaml
 ```
 
 Important values:

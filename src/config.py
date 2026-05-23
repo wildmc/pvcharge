@@ -42,10 +42,11 @@ class Config:
 
     @staticmethod
     def resolve_config_path(path: str) -> Path:
+        project_root = Path(__file__).resolve().parent.parent
         candidates = [
             Path(path),
+            project_root / path,
             Path(__file__).resolve().parent / path,
-            Path(__file__).resolve().parent.parent / path,
         ]
 
         for candidate in candidates:
@@ -56,10 +57,11 @@ class Config:
 
     @staticmethod
     def resolve_env_path(path: str) -> Path | None:
+        project_root = Path(__file__).resolve().parent.parent
         candidates = [
             Path(path),
+            project_root / path,
             Path(__file__).resolve().parent / path,
-            Path(__file__).resolve().parent.parent / path,
         ]
 
         for candidate in candidates:
