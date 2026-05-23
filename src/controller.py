@@ -60,13 +60,15 @@ class PVController:
                 self.buffer.pop(0)
 
             avg = self._avg()
+            calculated_amps = self._calc_amps(avg)
 
             logging.info(
-                "PV=%.0fW House=%.0fW Surplus=%.0fW Avg=%.0fW State=%s",
+                "PV=%.0fW House=%.0fW Surplus=%.0fW FloatingMean=%.0fW WouldSetMaxCurrent=%dA State=%s",
                 data.pv_power,
                 data.house_power,
                 data.surplus_power,
                 avg,
+                calculated_amps,
                 self.state
             )
 
@@ -88,10 +90,11 @@ class PVController:
             elif self.state == "CHARGING":
 
                 if self._should_stop(avg):
-                    self.wallbox.stop_charging()
+                    # Easee usage intentionally disabled.
+                    # self.wallbox.stop_charging()
                     self.state = "IDLE"
                     self.last_amps = 0
-                    logging.info("Stopping charging (low surplus)")
+                    logging.info("Would stop charging (low surplus)")
 
             # -------------------------
             # 3. wallbox heartbeat (EVERY 4 min)
@@ -104,8 +107,9 @@ class PVController:
                     amps = self._calc_amps(avg)
 
                     if amps < min_current:
-                        logging.info("Below min current -> stop charging")
-                        self.wallbox.stop_charging()
+                        logging.info("Below min current -> would stop charging")
+                        # Easee usage intentionally disabled.
+                        # self.wallbox.stop_charging()
                         self.state = "IDLE"
                         self.last_amps = 0
 
@@ -114,26 +118,26 @@ class PVController:
                         if abs(amps - self.last_amps) >= 1:
 
                             logging.info(
-                                "Updating charger current: %dA (TTL refresh)",
+                                "Would update Easee max current: %dA (TTL refresh)",
                                 amps
                             )
 
                             # ✅ WICHTIG: TTL = fail-safe
-                            self.wallbox.set_current_limit(
-                                amps=amps,
-                                duration_min=10
-                            )
+                            # self.wallbox.set_current_limit(
+                            #     amps=amps,
+                            #     duration_min=10
+                            # )
 
-                            self.wallbox.start_charging()
+                            # self.wallbox.start_charging()
                             self.last_amps = amps
 
                         else:
                             # heartbeat refresh ohne Änderung
-                            logging.debug("TTL refresh only (no amp change)")
-                            self.wallbox.set_current_limit(
-                                amps=self.last_amps,
-                                duration_min=10
-                            )
+                            logging.debug("Would refresh TTL only (no amp change)")
+                            # self.wallbox.set_current_limit(
+                            #     amps=self.last_amps,
+                            #     duration_min=10
+                            # )
 
                 self.last_wallbox_update = now
 

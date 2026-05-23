@@ -2,6 +2,7 @@ import logging
 import time
 
 from config import Config
+from controller import PVController
 
 from inverter.neoom_beaam import NeoomBeaamClient
 
@@ -32,21 +33,23 @@ def main():
     setup_logging()
 
     cfg = Config.load("config.yaml")
-    poll_interval = cfg.get("control", "poll_interval", default=20)
 
-    logging.info("Starting NEOOM BEAAM power monitor...")
+    logging.info("Starting NEOOM BEAAM dry-run controller...")
 
     inverter = create_inverter(cfg)
+    # Easee usage is intentionally disabled for now. The controller only logs
+    # the current that would be applied to the wallbox.
+    wallbox = None
+
+    controller = PVController(
+        inverter=inverter,
+        wallbox=wallbox,
+        config=cfg.raw,
+        mqtt=None,
+    )
 
     try:
-        while True:
-            data = inverter.read_power_data()
-            logging.info(
-                "PV power: %.0f W | House power: %.0f W",
-                data.pv_power,
-                data.house_power,
-            )
-            time.sleep(poll_interval)
+        controller.run()
     except KeyboardInterrupt:
         logging.info("Shutdown requested (Ctrl+C)")
     except Exception as e:
