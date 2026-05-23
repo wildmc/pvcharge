@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-from models.models import PowerData
+from inverter.models import PowerData
 
 
 class InverterBase(ABC):

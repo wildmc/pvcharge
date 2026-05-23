@@ -2,7 +2,7 @@ from datetime import datetime
 import time
 
 from inverter.base import InverterBase
-from models.models import PowerData
+from inverter.models import PowerData
 from pymodbus.client import ModbusTcpClient
 
 

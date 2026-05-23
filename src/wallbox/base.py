@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
-from models.models import ChargerState
+
+from wallbox.models import ChargerState
 
 
 class WallboxBase(ABC):

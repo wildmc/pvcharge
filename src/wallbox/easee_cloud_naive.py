@@ -1,8 +1,8 @@
 import requests
 from datetime import datetime
 
-from pvcharge.wallbox.base import WallboxBase
-from pvcharge.models import ChargerState
+from wallbox.base import WallboxBase
+from wallbox.models import ChargerState
 
 
 class EaseeNaiveCloudClient(WallboxBase):

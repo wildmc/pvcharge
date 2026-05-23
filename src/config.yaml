@@ -2,7 +2,7 @@ inverter:
   mode: neoom_beaam   # "neoom_beaam" oder "solax_modbus"
 
   neoom_beaam:
-    host: 192.168.178.XX
+    host: 192.168.178.84
     endpoint: /api/v1/site/state
     token: ""
     timeout: 10

@@ -4,7 +4,7 @@ import logging
 import requests
 
 from inverter.base import InverterBase
-from models.models import PowerData
+from inverter.models import PowerData
 
 
 logger = logging.getLogger(__name__)

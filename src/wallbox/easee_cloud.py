@@ -2,7 +2,7 @@ import requests
 from datetime import datetime
 
 from wallbox.base import WallboxBase
-from models.models import ChargerState
+from wallbox.models import ChargerState
 
 
 class EaseeCloudClient(WallboxBase):
