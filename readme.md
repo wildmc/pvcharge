@@ -1,12 +1,10 @@
-Ja — das lässt sich sehr sauber und vollständig bauen.
-Und mit deinen Randbedingungen würde ich die Architektur jetzt ziemlich eindeutig festziehen:
+Randbedingungen
 
 * Raspberry Pi
 * Python 3.11+
 * systemd
 * SolaX via Modbus TCP
 * Easee:
-
   * bevorzugt lokal
   * fallback Cloud
 * kein Webserver
@@ -16,15 +14,13 @@ Und mit deinen Randbedingungen würde ich die Architektur jetzt ziemlich eindeut
 * YAML-Konfiguration
 * journald Logging
 
-Die lokale Easee-API ist leider offiziell nicht besonders offen dokumentiert. Deshalb würde ich architektonisch unbedingt zwei Implementierungen vorsehen:
+Die lokale Easee-API ist leider offiziell nicht besonders offen dokumentiert. Deshalb zwei Implementierungen vorsehen:
 
 ```text
 WallboxBase
 ├── EaseeLocalClient
 └── EaseeCloudClient
 ```
-
-Dann kannst du später jederzeit wechseln.
 
 ---
 
@@ -165,8 +161,6 @@ Modbus TCP
 
 # Welche Register?
 
-Das hängt vom exakten Modell ab.
-
 Typischerweise:
 
 | Wert       | Register |
@@ -174,19 +168,13 @@ Typischerweise:
 | PV Power   | 0x0006   |
 | Load Power | 0x000A   |
 
-(je nach Firmware abweichend)
-
-Darum würde ich:
+Je nach Firmware abweichend daher konfigurierbar:
 
 ```yaml
 registers:
   pv_power: 6
   house_power: 10
 ```
-
-konfigurierbar machen.
-
-Das spart später Ärger.
 
 ---
 
@@ -231,7 +219,7 @@ class EaseeLocalClient(WallboxBase):
     ...
 ```
 
-würde intern so aufgebaut sein:
+intern so aufgebaut:
 
 ```text
 HTTP REST
@@ -246,8 +234,6 @@ Aber exakt dieselbe öffentliche API wie Cloud.
 # Easee Cloud
 
 ## easee_cloud.py
-
-Sehr viel robuster.
 
 Intern:
 
@@ -503,13 +489,9 @@ Weil sie:
 
 ist.
 
-Und weil du bewusst:
+Bewusst:
 
 * keinen Webstack
 * keine Datenbank
 * kein asyncio
 * keine Container-Orchestrierung
-
-hineinziehst.
-
-Für einen Raspberry Pi ist das genau die richtige Komplexitätsklasse.
