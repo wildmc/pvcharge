@@ -348,7 +348,7 @@ In that mode:
 - log the current that would be sent to Easee, but do not actually send
 
 ### TODOs
-- Bearer Token management. You need to get a valid bearer token by loggin in to https://developer.easee.com/reference/account_authenticate . This token will have a short living expiration time. Logging in again will give you an updated token. An automatic refresh in time needs to be implemented.
+- Bearer Token management. You need to get a valid bearer token by login in to https://developer.easee.com/reference/account_authenticate . This token will have a short living expiration time. Login in again will give you an updated token. An automatic refresh in time needs to be implemented.
 - Enabling production control, activate Easee wallbox client to
 by uncommenting the calls in `wallbox/easee_cloud.py`. To be validated, if the currently implemented (commented out) api calls do as expected.
 - There still seems to be an error: charging is not stopped, when surplus is too low -> examine
