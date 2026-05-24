@@ -5,6 +5,7 @@ from config import Config
 from controller import PVController
 
 from inverter.neoom_beaam import NeoomBeaamClient
+from wallbox.easee_cloud import EaseeCloudClient
 
 
 def setup_logging():
@@ -37,9 +38,11 @@ def main():
     logging.info("Starting NEOOM BEAAM dry-run controller...")
 
     inverter = create_inverter(cfg)
-    # Easee usage is intentionally disabled for now. The controller only logs
-    # the current that would be applied to the wallbox.
-    wallbox = None
+
+    wallbox = EaseeCloudClient(
+        api_key=cfg.get("wallbox", "cloud", "api_key"),
+        charger_id=cfg.get("wallbox", "cloud", "charger_id")
+    )
 
     controller = PVController(
         inverter=inverter,

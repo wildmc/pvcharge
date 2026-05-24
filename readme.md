@@ -1,5 +1,7 @@
 # PV Charge Control
 
+!! This is not a working implementation. Use at your own risk! !!
+
 PV Charge Control is a small Python service for PV surplus charging. It reads
 power data from the energy system, calculates the available surplus, and adjusts
 the maximum charging current of an Easee wallbox.
@@ -17,7 +19,7 @@ synchronous and single-threaded:
 5. Calculate the target current
 6. Apply the current limit to Easee with a short time-to-live
 
-Example log:
+Example log (probably outdated state):
 
 ```text
 PV=3200W House=1100W Surplus=2100W FloatingMean=1850W TargetCurrent=8A State=CHARGING
@@ -328,7 +330,7 @@ On Linux:
   and delay compensation are handled by the floating mean, hysteresis, and
   deliberately long update intervals. This should sufficiently cover the
   response delays in inverter measurement, cloud/API communication, and wallbox
-  behavior without adding PID tuning complexity. (And this is not a closed-loop-system at all.)
+  behavior without adding PID tuning complexity (in a first try).
 - TTL-based Easee control: the dynamic current limit is set with a 10-minute
   validity and refreshed by the controller. A service failure should therefore
   not keep an old charging current active indefinitely.
@@ -339,12 +341,14 @@ The intended state is active Easee control. During bring-up, the runtime may be
 left in dry-run mode to validate BEAAM readings and controller behavior first.
 In that mode:
 
-- read NEOOM BEAAM
+- read NEOOM BEAAM and EASEE
 - calculate surplus power
 - maintain floating mean
 - calculate target current
-- log the current that would be sent to Easee
+- log the current that would be sent to Easee, but do not actually send
 
-Before enabling production control, pass a real Easee wallbox client to
-`PVController` in `src/main.py` and uncomment the Easee calls in
-`src/controller.py`.
+### TODOs
+- Bearer Token management. You need to get a valid bearer token by loggin in to https://developer.easee.com/reference/account_authenticate . This token will have a short living expiration time. Logging in again will give you an updated token. An automatic refresh in time needs to be implemented.
+- Enabling production control, activate Easee wallbox client to
+by uncommenting the calls in `wallbox/easee_cloud.py`. To be validated, if the currently implemented (commented out) api calls do as expected.
+- There still seems to be an error: charging is not stopped, when surplus is too low -> examine

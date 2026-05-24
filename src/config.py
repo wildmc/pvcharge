@@ -102,6 +102,7 @@ class Config:
             "EASEE_LOCAL_HOST": ("wallbox", "local", "host"),
             "NEOOM_BEAAM_API_TOKEN": ("inverter", "neoom_beaam", "token"),
             "EASEE_API_KEY": ("wallbox", "cloud", "api_key"),
+            "EASEE_CHARGER_ID": ("wallbox", "cloud", "charger_id"),
         }
 
         for env_name, keys in overrides.items():

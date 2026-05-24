@@ -28,7 +28,7 @@ wallbox:
 
   cloud:
     api_key: ""
-    charger_id: "EHXXXXXXX"
+    charger_id: ""
 
 control:
   poll_interval: 20             # s
