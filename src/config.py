@@ -4,7 +4,6 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Dict
 
-
 @dataclass
 class Config:
     raw: Dict[str, Any]
@@ -101,7 +100,7 @@ class Config:
             "SOLAX_MODBUS_HOST": ("inverter", "solax_modbus", "host"),
             "EASEE_LOCAL_HOST": ("wallbox", "local", "host"),
             "NEOOM_BEAAM_API_TOKEN": ("inverter", "neoom_beaam", "token"),
-            "EASEE_API_KEY": ("wallbox", "cloud", "api_key"),
+            "EASEE_USER_NAME": ("wallbox", "cloud", "user_name"),
             "EASEE_CHARGER_ID": ("wallbox", "cloud", "charger_id"),
         }
 

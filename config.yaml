@@ -27,6 +27,7 @@ wallbox:
     host: ""
 
   cloud:
+    user_name: ""
     api_key: ""
     charger_id: ""
 

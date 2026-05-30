@@ -8,6 +8,7 @@ from inverter.neoom_beaam import NeoomBeaamClient
 from wallbox.easee_cloud import EaseeCloudClient
 
 
+
 def setup_logging():
     logging.basicConfig(
         level=logging.INFO,
@@ -40,7 +41,7 @@ def main():
     inverter = create_inverter(cfg)
 
     wallbox = EaseeCloudClient(
-        api_key=cfg.get("wallbox", "cloud", "api_key"),
+        user_name=cfg.get("wallbox", "cloud", "user_name"),
         charger_id=cfg.get("wallbox", "cloud", "charger_id")
     )
 

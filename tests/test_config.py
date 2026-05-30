@@ -43,7 +43,7 @@ class ConfigTest(unittest.TestCase):
             "NEOOM_BEAAM_API_TOKEN": "token",
             "SOLAX_MODBUS_HOST": "solax.local",
             "EASEE_LOCAL_HOST": "easee.local",
-            "EASEE_API_KEY": "easee-token",
+            "EASEE_USER_NAME": "easee-token",
         }, clear=True):
             cfg.apply_env_overrides()
 
@@ -51,7 +51,7 @@ class ConfigTest(unittest.TestCase):
         self.assertEqual(cfg.get("inverter", "neoom_beaam", "token"), "token")
         self.assertEqual(cfg.get("inverter", "solax_modbus", "host"), "solax.local")
         self.assertEqual(cfg.get("wallbox", "local", "host"), "easee.local")
-        self.assertEqual(cfg.get("wallbox", "cloud", "api_key"), "easee-token")
+        self.assertEqual(cfg.get("wallbox", "cloud", "user_name"), "easee-token")
 
     def test_require_env_prefers_environment_over_yaml(self):
         cfg = Config(raw={"inverter": {"neoom_beaam": {"host": "yaml-host"}}})
