@@ -12,6 +12,7 @@ class PVController:
 
         self.buffer = []
         self.last_wallbox_update = 0
+        self.last_wallbox_state_update = time.time()
 
         self.state = "IDLE"
         self.last_amps = 0
@@ -51,6 +52,10 @@ class PVController:
         min_current = self.config["control"]["min_current"]
 
         wallbox_state = self.wallbox.get_state()
+        self.last_wallbox_state_update = time.time()
+        self.last_wallbox_update = time.time()
+        if wallbox_state.enabled:
+            self.state = "CHARGING"
 
         while True:
 
@@ -99,6 +104,10 @@ class PVController:
                     self.last_amps = 0
                     logging.info("Would stop charging (low surplus)")
 
+            if now - self.last_wallbox_state_update > (update_interval / 2):
+                wallbox_state = self.wallbox.get_state()
+                self.last_wallbox_state_update = now
+
             # -------------------------
             # 3. wallbox heartbeat (EVERY 4 min)
             # -------------------------
@@ -106,7 +115,7 @@ class PVController:
             if now - self.last_wallbox_update > update_interval:
 
                 if self.state == "CHARGING":
-
+                    avg = self._avg() + wallbox_state.total_power
                     amps = self._calc_amps(avg)
 
                     if amps < min_current:
@@ -120,7 +129,7 @@ class PVController:
                         if abs(amps - self.last_amps) >= 1:
 
                             logging.info(
-                                "Would update Easee max current: %dA (TTL refresh)",
+                                "Will update Easee max current: %dA (TTL refresh)",
                                 amps
                             )
 
@@ -142,8 +151,6 @@ class PVController:
                             )
 
                 self.last_wallbox_update = now
-                time.sleep(poll_interval)
-                wallbox_state = self.wallbox.get_state()
 
             # -------------------------
             # 4. sleep

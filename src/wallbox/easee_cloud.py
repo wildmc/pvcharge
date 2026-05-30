@@ -24,15 +24,21 @@ class EaseeCloudClient(WallboxBase):
             "Content-Type": "application/json"
         }
 
-    def _post(self, url: str, json, timeout=10):
+    def _post(self, url: str, json=None, timeout=10):
         if self._access_token is None or self._refresh_token is None:
             self._authenticate()
 
-        r = requests.post(url=url, headers=self._headers(), json=json, timeout=timeout )
+        if json is None:
+            r = requests.post(url=url, headers=self._headers(), timeout=timeout)
+        else:
+            r = requests.post(url=url, headers=self._headers(), json=json, timeout=timeout )
 
         if r.status_code == 401:  # Token abgelaufen -> refresh
             self._refresh_tokens()
-            r = requests.post(url=url, headers=self._headers(), json=json, timeout=timeout)
+            if json is None:
+                r = requests.post(url=url, headers=self._headers(), timeout=timeout)
+            else:
+                r = requests.post(url=url, headers=self._headers(), json=json, timeout=timeout)
 
         r.raise_for_status()
 
@@ -71,23 +77,25 @@ class EaseeCloudClient(WallboxBase):
         self._post(url, payload)
 
     def start_charging(self):
-        url = f"{self.base_url}/chargers/{self.charger_id}/start_charging"
+        url = f"{self.base_url}/chargers/{self.charger_id}/commands/resume_charging"
         #r = requests.post(url, headers=self._headers(), timeout=10)
         #r.raise_for_status()
         logging.info("Wallbox: Start charging")
+        self._post(url)
 
     def stop_charging(self):
-        url = f"{self.base_url}/chargers/{self.charger_id}/stop_charging"
+        url = f"{self.base_url}/chargers/{self.charger_id}/commands/pause_charging"
         #r = requests.post(url, headers=self._headers(), timeout=10)
         #r.raise_for_status()
         logging.info("Wallbox: Stop charging")
+        self._post(url)
 
     def get_state(self) -> ChargerState:
         logging.info("Wallbox: Get state: ...")
         url = f"{self.base_url}/chargers/{self.charger_id}/state"
         data = self._get(url)
 
-        logging.info("Wallbox: Raw state: %s", str(data))
+        #logging.info("Wallbox: Raw state: %s", str(data))
 
         total_power = data.get("totalPower", 0.0)
 
