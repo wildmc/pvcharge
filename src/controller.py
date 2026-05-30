@@ -14,7 +14,6 @@ class PVController:
         self.last_wallbox_update = 0
         self.last_wallbox_state_update = time.time()
 
-        self.state = "IDLE"
         self.last_amps = 0
 
     # -------------------------
@@ -54,8 +53,6 @@ class PVController:
         wallbox_state = self.wallbox.get_state()
         self.last_wallbox_state_update = time.time()
         self.last_wallbox_update = time.time()
-        if wallbox_state.enabled:
-            self.state = "CHARGING"
 
         while True:
 
@@ -70,15 +67,14 @@ class PVController:
             calculated_amps = self._calc_amps(avg)
 
             logging.info(
-                "Controller: PV=%.0fW House=%.0fW Wallbox=%.0fW Surplus=%.0fW FloatingMean=%.0fW WallBoxEnabled=%d WouldSetMaxCurrent=%dA State=%s",
+                "Controller: PV=%.0fW House=%.0fW Wallbox=%.0fW Surplus=%.0fW FloatingMean=%.0fW WallBoxEnabled=%d WouldSetMaxCurrent=%dA",
                 data.pv_power,
                 data.house_power,
                 wallbox_state.total_power,
                 data.surplus_power,
                 avg,
                 int(wallbox_state.enabled),
-                calculated_amps,
-                self.state
+                calculated_amps
             )
 
             if self.mqtt:
@@ -90,23 +86,18 @@ class PVController:
             # 2. state machine
             # -------------------------
 
-            if self.state == "IDLE":
-
-                if self._should_charge(avg):
-                    self.state = "CHARGING"
-                    logging.info("Switching to CHARGING")
-
-            elif self.state == "CHARGING":
-
-                if self._should_stop(avg):
-                    self.wallbox.stop_charging()
-                    self.state = "IDLE"
-                    self.last_amps = 0
-                    logging.info("Would stop charging (low surplus)")
-
             if now - self.last_wallbox_state_update > (update_interval / 2):
                 wallbox_state = self.wallbox.get_state()
                 self.last_wallbox_state_update = now
+
+                if wallbox_state.enabled and self._should_stop(avg):
+                    logging.info("Pause charging (low surplus)")
+                    self.wallbox.stop_charging()
+                    self.last_amps = 0
+                elif self._should_charge(avg) and not wallbox_state.enabled:
+                    logging.info("Resume charging")
+                    self.wallbox.start_charging()
+
 
             # -------------------------
             # 3. wallbox heartbeat (EVERY 4 min)
@@ -114,14 +105,14 @@ class PVController:
 
             if now - self.last_wallbox_update > update_interval:
 
-                if self.state == "CHARGING":
+                if wallbox_state.enabled:
+                    self.last_wallbox_update = now
                     avg = self._avg() + wallbox_state.total_power
                     amps = self._calc_amps(avg)
 
                     if amps < min_current:
                         logging.info("Below min current -> would stop charging")
                         self.wallbox.stop_charging()
-                        self.state = "IDLE"
                         self.last_amps = 0
 
                     else:
@@ -144,13 +135,12 @@ class PVController:
 
                         else:
                             # heartbeat refresh ohne Änderung
-                            logging.debug("Would refresh TTL only (no amp change)")
+                            logging.debug("Refresh TTL only (no amp change)")
                             self.wallbox.set_current_limit(
                                  amps=self.last_amps,
                                  duration_min=10
                             )
 
-                self.last_wallbox_update = now
 
             # -------------------------
             # 4. sleep
