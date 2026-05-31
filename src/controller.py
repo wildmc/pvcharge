@@ -98,6 +98,7 @@ class PVController:
                 elif self._should_charge(avg) and not wallbox_state.enabled:
                     logging.info("Resume charging")
                     self.wallbox.start_charging()
+                    self.last_wallbox_state_update = 0
 
 
             # -------------------------

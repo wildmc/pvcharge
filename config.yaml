@@ -50,7 +50,11 @@ control:
   stop_below_min_current: true
 
 mqtt:
-  enabled: false
-  host: 192.168.1.10
+  enabled: true
+  host: 127.0.0.1
   port: 1883
+  client_id: pv-charge-control
   topic_prefix: pvcharge
+  keepalive: 60
+  qos: 0
+  retain: false

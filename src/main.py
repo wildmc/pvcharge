@@ -3,6 +3,7 @@ import time
 
 from config import Config
 from controller import PVController
+from mqtt import MqttClient
 
 from inverter.neoom_beaam import NeoomBeaamClient
 from wallbox.easee_cloud import EaseeCloudClient
@@ -31,6 +32,25 @@ def create_inverter(cfg):
     )
 
 
+def create_mqtt(cfg):
+    mqtt_config = cfg.get("mqtt", default={})
+    if not mqtt_config.get("enabled", False):
+        return None
+
+    try:
+        mqtt_client = MqttClient.from_config(mqtt_config)
+        logging.info(
+            "MQTT enabled: publishing to %s/status via %s:%s",
+            mqtt_config.get("topic_prefix", "pvcharge"),
+            mqtt_config.get("host", "127.0.0.1"),
+            mqtt_config.get("port", 1883),
+        )
+        return mqtt_client
+    except Exception as exc:
+        logging.warning("MQTT disabled: could not connect to broker: %s", exc)
+        return None
+
+
 def main():
     setup_logging()
 
@@ -45,11 +65,13 @@ def main():
         charger_id=cfg.get("wallbox", "cloud", "charger_id")
     )
 
+    mqtt_client = create_mqtt(cfg)
+
     controller = PVController(
         inverter=inverter,
         wallbox=wallbox,
         config=cfg.raw,
-        mqtt=None,
+        mqtt=mqtt_client,
     )
 
     try:
@@ -60,6 +82,9 @@ def main():
         logging.exception("Fatal error: %s", e)
         time.sleep(5)
         raise
+    finally:
+        if mqtt_client:
+            mqtt_client.close()
 
 
 if __name__ == "__main__":

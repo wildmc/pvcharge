@@ -35,6 +35,10 @@ class MockEaseeApi:
             "isEnabled": False,
             "dynamicChargerCurrent": 0,
         }
+        self.tokens = {
+            "accessToken": "access-token",
+            "refreshToken": "refresh-token",
+        }
         self.calls = []
 
     def get(self, url, headers=None, timeout=None):
@@ -54,4 +58,8 @@ class MockEaseeApi:
             "json": json,
             "timeout": timeout,
         })
+
+        if url.endswith("/accounts/login") or url.endswith("/accounts/refresh_token"):
+            return MockResponse(self.tokens)
+
         return MockResponse()
