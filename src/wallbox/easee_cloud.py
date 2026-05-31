@@ -114,7 +114,12 @@ class EaseeCloudClient(WallboxBase):
         logging.debug("Wallbox: Refresh Tokens: ...")
         url = f"{self.base_url}/accounts/refresh_token"
 
-        r = requests.post(url, headers=self._headers(), timeout=10)
+        payload = {
+            "accessToken": self._access_token,
+            "refreshToken": self._refresh_token
+        }
+
+        r = requests.post(url, headers=self._headers(), json=payload, timeout=10)
         r.raise_for_status()
 
         data = r.json()
