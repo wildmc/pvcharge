@@ -114,7 +114,7 @@ class PVController:
                         logging.info("Below min current -> would stop charging")
                         self.wallbox.stop_charging()
                         self.last_amps = 0
-
+                        wallbox_state.total_power = 0
                     else:
                         # nur aktualisieren wenn Änderung sinnvoll
                         if abs(amps - self.last_amps) >= 1:
