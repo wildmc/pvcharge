@@ -94,6 +94,7 @@ class PVController:
                     logging.info("Pause charging (low surplus)")
                     self.wallbox.stop_charging()
                     self.last_amps = 0
+                    wallbox_state.total_power = 0
                 elif self._should_charge(avg) and not wallbox_state.enabled:
                     logging.info("Resume charging")
                     self.wallbox.start_charging()
